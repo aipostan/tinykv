@@ -46,9 +46,8 @@ func (s *StandAloneStorage) Reader(ctx *kvrpcpb.Context) (storage.StorageReader,
 	return NewStandAloneStorageReader(s.eng.Kv.NewTransaction(false)), nil
 }
 
-func (s *StandAloneStorage) Write(ctx *kvrpcpb.Context, batch []storage.Modify) error {
+func (s *StandAloneStorage) Write(ctx *kvrpcpb.Context, batch []storage.Modify) (err error) {
 	// Your Code Here (1).
-	var err error = nil
 	for _, quest := range batch {
 		switch quest.Data.(type) {
 		case storage.Put:
@@ -57,10 +56,10 @@ func (s *StandAloneStorage) Write(ctx *kvrpcpb.Context, batch []storage.Modify) 
 			err = engine_util.DeleteCF(s.eng.Kv, quest.Cf(), quest.Key())
 		}
 		if err != nil {
-			return err
+			return
 		}
 	}
-	return err
+	return
 }
 
 type StandAloneStorageReader struct {
