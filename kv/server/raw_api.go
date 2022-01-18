@@ -18,12 +18,14 @@ func (server *Server) RawGet(_ context.Context, req *kvrpcpb.RawGetRequest) (*kv
 	}
 	val, err := reader.GetCF(req.Cf, req.Key)
 	if err != nil {
+		reader.Close()
 		return &kvrpcpb.RawGetResponse{}, err
 	}
 	resp := &kvrpcpb.RawGetResponse{
 		Value:    val,
 		NotFound: val == nil,
 	}
+	reader.Close()
 	return resp, nil
 }
 
@@ -72,10 +74,14 @@ func (server *Server) RawScan(_ context.Context, req *kvrpcpb.RawScanRequest) (*
 			Value: val,
 		})
 		if err != nil {
+			iter.Close()
+			reader.Close()
 			return nil, err
 		}
 		lim--
 	}
+	iter.Close()
+	reader.Close()
 	return &kvrpcpb.RawScanResponse{
 		Kvs: Kvs,
 	}, nil

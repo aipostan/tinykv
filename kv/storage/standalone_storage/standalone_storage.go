@@ -18,7 +18,7 @@ type StandAloneStorage struct {
 
 func NewStandAloneStorage(conf *config.Config) *StandAloneStorage {
 	// Your Code Here (1).
-	Path := conf.StoreAddr
+	Path := conf.DBPath
 	KvPath := path.Join(Path, "kv")
 	RaftPath := path.Join(Path, "Raft")
 	return &StandAloneStorage{
@@ -73,8 +73,8 @@ func NewStandAloneStorageReader(KvTxn *badger.Txn) *StandAloneStorageReader {
 	}
 }
 
-func (s *StandAloneStorageReader) GetCF(cf string, key []byte) (ret []byte, err error) {
-	ret, err = engine_util.GetCFFromTxn(s.KvTxn, cf, key)
+func (s *StandAloneStorageReader) GetCF(cf string, key []byte) (val []byte, err error) {
+	val, err = engine_util.GetCFFromTxn(s.KvTxn, cf, key)
 	if err == badger.ErrKeyNotFound {
 		return nil, nil
 	}
